@@ -1,28 +1,45 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <ThemeSwitcher />
+
+    <DateInput v-model="selectedDate" />
+
+    <DateRangeInput v-model="selectedRange" />
+
+    <h2>Демо: Дата и время</h2>
+    <DateTimeInput v-model="dateTime" />
+    <p>Дата и время: {{ dateTime }}</p>
+
+    <h2>Демо: Период с датой и временем</h2>
+    <DateTimeRangeInput v-model="dateTimeRange" />
+    <p>Период: {{ dateTimeRange }}</p>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import DateInput from "./components/inputs/DateInput.vue";
+import DateRangeInput from "./components/inputs/DateRangeInput.vue";
+import DateTimeInput from "./components/inputs/DateTimeInput.vue";
+import DateTimeRangeInput from "./components/inputs/DateTimeRangeInput.vue";
+import ThemeSwitcher from "./components/ThemeSwitcher.vue";
+import "./assets/styles/main.css";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    DateInput,
+    DateRangeInput,
+    DateTimeInput,
+    DateTimeRangeInput,
+    ThemeSwitcher,
+  },
+  data() {
+    return {
+      selectedDate: null,
+      selectedRange: [null, null],
+      dateTime: null,
+      dateTimeRange: [null, null],
+    };
+  },
+};
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>

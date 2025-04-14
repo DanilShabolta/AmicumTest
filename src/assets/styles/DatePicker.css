@@ -1,0 +1,154 @@
+.custom-footer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  background-color: var(--input-bg, #fff);
+  padding: 0;
+}
+
+.mx-datepicker-footer {
+  border: none;
+  padding: 0;
+}
+
+.mx-calendar-header {
+  background-color: #f2f4fd;
+  border-bottom: 1px solid #6f8bb7;
+}
+
+.confirm-btn {
+  flex: 1;
+  background-color: #6484c5;
+  color: #ffffff;
+  border: 1px solid #647cab;
+  padding: 11px 29.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.confirm-btn:hover {
+  background-color: #2f5ac2;
+}
+
+.cancel-btn {
+  flex: 1;
+  background-color: transparent;
+  color: #7b7b7b;
+  border: none;
+  border-right: 1px solid #b3bdd3;
+  border-bottom: 1px solid #b3bdd3;
+  padding: 11px 29.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.cancel-btn:hover {
+  color: #555;
+}
+
+.dark-theme .cancel-btn {
+  color: #ffffff;
+  border-right: 1px solid #647cab;
+  border-bottom: 1px solid #647cab;
+}
+
+.mx-datepicker-main {
+  background-color: transparent;
+  border: none;
+}
+
+.mx-calendar {
+  width: 340px;
+  height: 268px;
+  background-color: #ffffff;
+  color: #2a2a2a;
+  border: 1px solid #6f8bb7;
+  font-family: inherit;
+  padding: 0;
+}
+
+.mx-table-date thead th {
+  color: #7b7b7b;
+  font-weight: 500;
+}
+
+.mx-date {
+  background-color: transparent;
+  color: #2a2a2a;
+}
+
+.mx-date:hover {
+  background-color: #e6eaff;
+  color: #2a2a2a;
+}
+
+.mx-selected {
+  background-color: #3b6cd6;
+  color: #ffffff;
+}
+
+.mx-table-date .cell.not-current-month {
+  color: #c2c2c2;
+}
+
+.mx-year-btn,
+.mx-month-btn {
+  background-color: #e6eaff;
+  color: #3b6cd6;
+  padding: 4px 8px;
+  font-weight: 500;
+}
+
+.dark-theme .mx-calendar {
+  background-color: #1e253a;
+  color: #ffffff;
+  border: 1px solid #2f3a5a;
+}
+
+.dark-theme .mx-datepicker-body {
+  background-color: transparent;
+  border: none;
+}
+
+.dark-theme .mx-input {
+  background-color: #2f3a5a;
+  color: #ffffff;
+  border: 1px solid #3f4b6c;
+}
+
+.dark-theme .mx-table-date thead th {
+  color: #9faabe;
+}
+
+.dark-theme .mx-date {
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.dark-theme .mx-date:hover {
+  background-color: #3b6cd6;
+  color: #ffffff;
+}
+
+.dark-theme .mx-selected {
+  background-color: #9747ff;
+  color: #ffffff;
+}
+
+.dark-theme .mx-table-date .cell.not-current-month {
+  color: #73879c;
+}
+
+.dark-theme .mx-btn-icon,
+.dark-theme .mx-icon-calendar {
+  color: #c1c8d4;
+}
+
+.dark-theme .mx-year-btn,
+.dark-theme .mx-month-btn {
+  background-color: #3b6cd6;
+  color: #ffffff;
+  padding: 4px 8px;
+}

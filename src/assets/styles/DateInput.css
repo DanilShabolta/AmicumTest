@@ -1,0 +1,150 @@
+.date-input input,
+.date-time-range input,
+.date-time-input {
+  border-radius: 4px;
+  border-width: 1px;
+}
+
+.input-wrapper {
+  display: flex;
+  gap: 15px;
+}
+
+.input-empty {
+  background-color: #f2f4fd;
+  color: #c4c4c4;
+}
+
+.input-empty:hover {
+  background-color: #e7e9f0;
+  color: #7d8ca7;
+}
+
+.input-empty.error {
+  background-color: #faf2f2;
+  border-color: #d7a3a3;
+  color: #b16464;
+}
+
+.input-filled {
+  background-color: #f2f4fd;
+  border-color: #f2f4fd;
+  color: #000000;
+}
+
+.input-filled:hover {
+  background-color: #e7e9f0;
+  color: #000000;
+}
+
+.input-filled.error {
+  background-color: #faf2f2;
+  border-color: #d7a3a3;
+  color: #b16464;
+}
+
+.input-disabled {
+  background-color: #f2f4fd;
+  color: #c4c4c4;
+}
+
+.dark-theme .date-input input,
+.dark-theme .date-time-range input {
+  color: #c1c8d4;
+}
+
+.dark-theme .input-empty {
+  background-color: #2f3a5a;
+}
+
+.dark-theme .input-empty:hover {
+  background-color: #3d4c77;
+  color: #9faabe;
+}
+
+.dark-theme .input-empty.error {
+  background-color: #4a2d27;
+  border-color: #895b5b;
+  color: #fac4c4;
+}
+
+.dark-theme .input-filled {
+  background-color: #2a344e;
+  color: #ffffff;
+}
+
+.dark-theme .input-filled:hover {
+  background-color: #3d4c77;
+  color: #ffffff;
+}
+
+.dark-theme .input-filled.error {
+  background-color: #4a2d27;
+  border-color: #895b5b;
+  color: #fac4c4;
+}
+
+.dark-theme .input-disabled {
+  background-color: #2a344e;
+  color: #6f6f6f;
+}
+
+.mx-icon-calendar {
+  cursor: pointer;
+}
+
+.dark-theme .label {
+  color: var(--text-color);
+}
+
+.dark-theme .input-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.dark-theme input {
+  background-color: var(--input-bg);
+  color: #c1c8d4;
+  border: 1px solid var(--border-color);
+}
+
+.dark-theme input:focus {
+  border-color: #ffffff;
+}
+
+.dark-theme .date-picker-wrapper .date-picker {
+  background-color: var(--input-bg);
+  border-radius: 6px;
+}
+
+.dark-theme .date-picker-wrapper ::v-deep .mx-input {
+  background-color: var(--input-bg);
+  color: #c1c8d4;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  height: 36px;
+  box-shadow: none;
+  outline: none;
+}
+
+.dark-theme .date-picker-wrapper ::v-deep .mx-input:focus {
+  box-shadow: 0 0 0 2px #aac8ff;
+}
+
+.dark-theme .date-picker-wrapper ::v-deep .mx-icon-calendar {
+  color: #c1c8d4;
+  font-size: 16px;
+  right: 10px;
+}
+
+.date-range-input {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+}
+
+.mx-icon-calendar {
+  font-size: 16px;
+}

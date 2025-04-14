@@ -1,0 +1,59 @@
+#app {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+:root {
+  --bg-color: #ffffff;
+  --text-color: #222222;
+  --input-bg: #f9f9f9;
+  --border-color: #cccccc;
+  --button-bg: #eeeeee;
+  --button-text: #000000;
+}
+
+.dark-theme {
+  --bg-color: #181f32;
+  --text-color: #ffffff;
+  --input-bg: #2f3a5a;
+  --border-color: #555555;
+  --button-bg: #333333;
+  --button-text: #ffffff;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+  font-family: sans-serif;
+  padding: 20px;
+}
+
+input {
+  transition: background-color 0.3s, color 0.3s;
+  transition: border-color 0.3s, color 0.3s;
+  border-radius: 4px;
+  padding: 6px 8px;
+  background-color: var(--input-bg);
+  color: #c1c8d4;
+  border: 1px;
+}
+
+input:focus {
+  border-color: #ffffff;
+}
+
+button {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+}
+
+.date-input .input-wrapper {
+  padding: 6px 8px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
