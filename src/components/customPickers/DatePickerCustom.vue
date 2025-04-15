@@ -16,12 +16,9 @@
           <input
             ref="customInput"
             type="text"
-            :value="formattedDate"
-            @input="onInput"
-            @focus.prevent
-            @keydown.enter="confirm"
-            placeholder="ДД.ММ.ГГГГ"
             class="custom-input"
+            placeholder="ДД.ММ.ГГГГ"
+            @focus.prevent
           />
         </div>
       </template>
@@ -38,7 +35,8 @@
 <script>
 import DatePicker from "vue2-datepicker";
 import "vue2-datepicker/index.css";
-import { format, parse } from "date-fns";
+import IMask from "imask";
+import { isValid } from "date-fns";
 
 export default {
   name: "DatePickerCustom",
@@ -50,42 +48,87 @@ export default {
     return {
       tempDate: this.value,
       open: false,
+      mask: null,
     };
   },
-  computed: {
-    formattedDate() {
-      return this.tempDate ? format(this.tempDate, "dd.MM.yyyy") : "";
-    },
+  mounted() {
+    this.initMask();
   },
   methods: {
+    initMask() {
+      const input = this.$refs.customInput;
+      this.mask = IMask(input, {
+        mask: Date,
+        pattern: "d.`m.`Y",
+        lazy: false,
+        autofix: true,
+        overwrite: true,
+        blocks: {
+          d: {
+            mask: IMask.MaskedRange,
+            from: 1,
+            to: 31,
+            maxLength: 2,
+            placeholderChar: "Д",
+          },
+          m: {
+            mask: IMask.MaskedRange,
+            from: 1,
+            to: 12,
+            maxLength: 2,
+            placeholderChar: "М",
+          },
+          Y: {
+            mask: IMask.MaskedRange,
+            from: 1900,
+            to: 2099,
+            placeholderChar: "Г",
+          },
+        },
+        format: (date) => {
+          return date.toLocaleDateString("ru-RU");
+        },
+        parse: (str) => {
+          const [day, month, year] = str.split(".").map(Number);
+          return new Date(year, month - 1, day);
+        },
+      });
+
+      this.mask.on("accept", () => {
+        const parsed = this.mask.typedValue;
+        if (parsed && isValid(parsed)) {
+          this.tempDate = parsed;
+        }
+      });
+    },
+    handleDateChange(date) {
+      this.tempDate = date;
+    },
     confirm() {
       this.$emit("input", this.tempDate);
       this.$emit("confirm", this.tempDate);
       this.open = false;
+      if (this.mask) {
+        this.mask.typedValue = this.tempDate;
+      }
     },
     cancel() {
       this.open = false;
       this.tempDate = this.value;
-    },
-    handleDateChange(value) {
-      this.tempDate = value;
-    },
-    onInput(e) {
-      const inputVal = e.target.value;
-      this.$emit("input-text", inputVal);
-      this.$emit("input-change", inputVal);
-      const parsed = parse(inputVal, "dd.MM.yyyy", new Date());
-      if (!isNaN(parsed)) {
-        this.tempDate = parsed;
+      if (this.mask) {
+        this.mask.typedValue = this.tempDate;
       }
     },
-    clearInput() {
-      this.$refs.customInput.value = "";
+    toggle() {
+      this.open = !this.open;
     },
   },
   watch: {
     value(newVal) {
       this.tempDate = newVal;
+      if (this.mask && isValid(newVal)) {
+        this.mask.typedValue = newVal;
+      }
     },
   },
 };
