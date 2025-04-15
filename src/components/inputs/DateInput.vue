@@ -1,21 +1,24 @@
 <template>
   <div class="date-input">
-    <div class="input-wrapper">
-      <input
-        ref="input"
-        v-model="manualInput"
-        class="manual-input"
-        placeholder="дд.мм.гггг"
-        @input="handleInput"
-      />
-      <span v-if="manualInput" class="clear-icon" @click="clearInput">×</span>
-      <span class="calendar-icon" @click="toggleCalendar"> 📅 </span>
+    <div class="calendar-wrapper">
       <date-picker-custom
-        v-if="showCalendar"
-        v-model="tempValue"
-        @confirm="handleConfirm"
-        @cancel="showCalendar = false"
+        v-model="internalValue"
+        :error="error"
+        @clear="clearDate"
+        ref="customPicker"
+        @focus="handleFocus"
       />
+      <span
+        v-if="internalValue || $refs.customPicker?.$refs.datepicker?.inputValue"
+        class="clear-icon"
+        @click="clearDate"
+        >×</span
+      >
+      <i
+        class="vue2-datepicker__icon"
+        @click="toggleCalendar"
+        role="button"
+      ></i>
     </div>
   </div>
 </template>
@@ -28,75 +31,34 @@ export default {
   components: { DatePickerCustom },
   props: {
     value: { type: Date, default: null },
+    error: { type: Boolean, default: false },
   },
   data() {
     return {
-      manualInput: "",
-      tempValue: null,
-      showCalendar: false,
+      internalValue: this.value,
     };
   },
   watch: {
-    value(val) {
-      this.manualInput = val ? new Date(val).toLocaleDateString("ru-RU") : "";
+    value(newVal) {
+      this.internalValue = newVal;
     },
-  },
-  mounted() {
-    if (this.value) {
-      this.manualInput = new Date(this.value).toLocaleDateString("ru-RU");
-    }
+    internalValue(newVal) {
+      this.$emit("input", newVal);
+    },
   },
   methods: {
-    handleInput(e) {
-      let val = e.target.value.replace(/\D/g, "").slice(0, 8);
-      if (val.length >= 5) {
-        val = val.replace(/(\d{2})(\d{2})(\d{0,4})/, "$1.$2.$3");
-      } else if (val.length >= 3) {
-        val = val.replace(/(\d{2})(\d{0,2})/, "$1.$2");
-      }
-      this.manualInput = val;
-    },
     toggleCalendar() {
-      this.showCalendar = !this.showCalendar;
+      this.$refs.customPicker?.toggle();
     },
-    handleConfirm(date) {
-      this.$emit("input", date);
-      this.manualInput = new Date(date).toLocaleDateString("ru-RU");
-      this.showCalendar = false;
+    clearDate() {
+      this.internalValue = null;
     },
-    clearInput() {
-      this.manualInput = "";
-      this.$emit("input", null);
+    handleFocus(event) {
+      event.preventDefault();
+    },
+    handleInputChange(value) {
+      this.internalValue = value;
     },
   },
 };
 </script>
-
-<style scoped>
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.manual-input {
-  width: 100%;
-  padding-right: 60px;
-  font-size: 14px;
-}
-
-.clear-icon {
-  position: absolute;
-  right: 30px;
-  cursor: pointer;
-  font-size: 18px;
-  color: #999;
-}
-
-.calendar-icon {
-  position: absolute;
-  right: 8px;
-  cursor: pointer;
-  font-size: 16px;
-}
-</style>
