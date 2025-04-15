@@ -5,15 +5,11 @@
         v-model="internalValue"
         :error="error"
         @clear="clearDate"
-        ref="customPicker"
         @focus="handleFocus"
+        @input-text="updateInputText"
+        ref="customPicker"
       />
-      <span
-        v-if="internalValue || $refs.customPicker?.$refs.datepicker?.inputValue"
-        class="clear-icon"
-        @click="clearDate"
-        >×</span
-      >
+      <span v-if="inputText" class="clear-icon" @click="clearDate">×</span>
       <i
         class="vue2-datepicker__icon"
         @click="toggleCalendar"
@@ -36,6 +32,7 @@ export default {
   data() {
     return {
       internalValue: this.value,
+      inputText: "",
     };
   },
   watch: {
@@ -52,12 +49,13 @@ export default {
     },
     clearDate() {
       this.internalValue = null;
+      this.$refs.customPicker?.clearInput();
     },
     handleFocus(event) {
       event.preventDefault();
     },
-    handleInputChange(value) {
-      this.internalValue = value;
+    updateInputText(text) {
+      this.inputText = text;
     },
   },
 };

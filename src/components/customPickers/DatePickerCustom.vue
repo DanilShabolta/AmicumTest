@@ -72,11 +72,15 @@ export default {
     },
     onInput(e) {
       const inputVal = e.target.value;
+      this.$emit("input-text", inputVal);
       this.$emit("input-change", inputVal);
       const parsed = parse(inputVal, "dd.MM.yyyy", new Date());
       if (!isNaN(parsed)) {
         this.tempDate = parsed;
       }
+    },
+    clearInput() {
+      this.$refs.customInput.value = "";
     },
   },
   watch: {
