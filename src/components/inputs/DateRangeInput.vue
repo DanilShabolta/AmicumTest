@@ -1,12 +1,31 @@
 <template>
   <div class="date-range-input">
-    <input
-      class="manual-input"
-      :value="formattedValue"
-      placeholder="Введите период"
-    />
-    <div class="calendar-wrapper">
-      <date-range-picker-custom v-model="internalValue" />
+    <div
+      class="calendar-wrapper"
+      :class="{
+        'has-value': rawText || (internalRange[0] && internalRange[1]),
+        'has-error': error,
+      }"
+    >
+      <date-range-picker-custom
+        v-model="internalRange"
+        :error="error"
+        @clear="clearRange"
+        @raw-input="rawText = $event"
+        ref="customPicker"
+        :clear-trigger="clearTrigger"
+      />
+      <span
+        v-if="rawText || (internalRange[0] && internalRange[1])"
+        class="clear-icon"
+        @click="clearRange"
+        >×</span
+      >
+      <i
+        class="vue2-datepicker__icon"
+        @click="toggleCalendar"
+        role="button"
+      ></i>
     </div>
   </div>
 </template>
@@ -18,6 +37,10 @@ export default {
   name: "DateRangeInput",
   components: { DateRangePickerCustom },
   props: {
+    value: {
+      type: Array,
+      default: () => [null, null],
+    },
     error: {
       type: Boolean,
       default: false,
@@ -25,29 +48,37 @@ export default {
   },
   data() {
     return {
-      internalValue: this.value,
+      internalRange: [...this.value],
+      rawText: "",
+      clearTrigger: false,
     };
-  },
-  computed: {
-    formattedValue() {
-      if (!Array.isArray(this.internalValue)) return "";
-
-      const [from, to] = this.internalValue;
-      return from && to
-        ? `${new Date(from).toLocaleDateString("ru-RU")} - ${new Date(
-            to
-          ).toLocaleDateString("ru-RU")}`
-        : "";
-    },
   },
   watch: {
     value(newVal) {
-      this.internalValue = newVal;
+      this.internalRange = [...newVal];
     },
-    internalValue(newVal) {
+    internalRange(newVal) {
       this.$emit("input", newVal);
+      this.rawText = this.formatRange(newVal);
     },
   },
-  methods: {},
+  methods: {
+    toggleCalendar() {
+      this.$refs.customPicker?.toggle();
+    },
+    clearRange() {
+      this.internalRange = [null, null];
+      this.rawText = "";
+      this.clearTrigger = !this.clearTrigger;
+    },
+    formatRange([start, end]) {
+      if (!start || !end) return "";
+      const formatDate = (d) =>
+        `${String(d.getDate()).padStart(2, "0")}.${String(
+          d.getMonth() + 1
+        ).padStart(2, "0")}.${d.getFullYear()}`;
+      return `${formatDate(start)} - ${formatDate(end)}`;
+    },
+  },
 };
 </script>
