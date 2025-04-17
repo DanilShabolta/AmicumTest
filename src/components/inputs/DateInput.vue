@@ -1,15 +1,26 @@
 <template>
   <div class="date-input">
-    <div class="calendar-wrapper">
+    <div
+      class="calendar-wrapper"
+      :class="{
+        'has-value': rawText || internalValue,
+        'has-error': error,
+      }"
+    >
       <date-picker-custom
         v-model="internalValue"
         :error="error"
         @clear="clearDate"
+        @raw-input="rawText = $event"
         ref="customPicker"
-        @focus="handleFocus"
-        @input="handleInput"
+        :clear-trigger="clearTrigger"
       />
-      <span v-if="showClearIcon" class="clear-icon" @click="clearDate">×</span>
+      <span
+        v-if="rawText || internalValue"
+        class="clear-icon"
+        @click="clearDate"
+        >×</span
+      >
       <i
         class="vue2-datepicker__icon"
         @click="toggleCalendar"
@@ -33,12 +44,8 @@ export default {
     return {
       internalValue: this.value,
       rawText: "",
+      clearTrigger: false,
     };
-  },
-  computed: {
-    showClearIcon() {
-      return this.rawText.length > 0 || !!this.internalValue;
-    },
   },
   watch: {
     value(newVal) {
@@ -46,6 +53,7 @@ export default {
     },
     internalValue(newVal) {
       this.$emit("input", newVal);
+      this.rawText = newVal ? this.formatDate(newVal) : "";
     },
   },
   methods: {
@@ -55,13 +63,14 @@ export default {
     clearDate() {
       this.internalValue = null;
       this.rawText = "";
-      this.$refs.customPicker?.clearInput();
+      this.clearTrigger = !this.clearTrigger;
     },
-    handleFocus(event) {
-      event.preventDefault();
-    },
-    handleInput() {
-      this.rawText = this.$refs.customPicker?.getMaskedValue() || "";
+    formatDate(date) {
+      return date
+        ? `${String(date.getDate()).padStart(2, "0")}.${String(
+            date.getMonth() + 1
+          ).padStart(2, "0")}.${date.getFullYear()}`
+        : "";
     },
   },
 };

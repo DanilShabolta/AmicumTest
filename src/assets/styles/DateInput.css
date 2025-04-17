@@ -37,7 +37,8 @@
   color: #000000;
 }
 
-.input-filled.error {
+.input-error,
+.input-error:hover {
   background-color: #faf2f2;
   border-color: #d7a3a3;
   color: #b16464;
@@ -62,7 +63,7 @@
   color: #9faabe;
 }
 
-.dark-theme .input-empty.error {
+.dark-theme .input-error {
   background-color: #4a2d27;
   border-color: #895b5b;
   color: #fac4c4;
@@ -91,6 +92,7 @@
 
 .mx-icon-calendar {
   cursor: pointer;
+  font-size: 16px;
 }
 
 .dark-theme .label {
@@ -143,8 +145,4 @@
   display: flex;
   flex-direction: row;
   gap: 15px;
-}
-
-.mx-icon-calendar {
-  font-size: 16px;
 }

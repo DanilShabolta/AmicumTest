@@ -32,10 +32,16 @@
   padding-right: 60px;
   height: 32px;
   font-size: 14px;
-  border: 1px solid #ccc;
+  background-color: #f2f4fd;
+  border: 1px solid #f2f4fd;
   border-radius: 4px;
   padding-left: 8px;
   box-sizing: border-box;
+}
+
+.custom-input:focus {
+  border: 1px solid #f2f4fd;
+  outline: none;
 }
 
 .custom-footer {
@@ -152,10 +158,10 @@
   border: none;
 }
 
-.dark-theme .mx-input {
+.dark-theme .custom-input {
   background-color: #2f3a5a;
   color: #ffffff;
-  border: 1px solid #3f4b6c;
+  border: 1px #3f4b6c;
 }
 
 .dark-theme .mx-table-date thead th {
