@@ -128,6 +128,7 @@ export default {
     },
     clearTrigger() {
       this.rawInput = "";
+      this.hasInputError = false;
     },
   },
 };

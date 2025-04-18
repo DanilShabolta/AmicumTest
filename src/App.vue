@@ -3,16 +3,12 @@
     <ThemeSwitcher />
 
     <DateInput v-model="selectedDate" />
+    <h2></h2>
 
     <DateRangeInput v-model="selectedRange" />
 
-    <h2>Демо: Дата и время</h2>
+    <h2></h2>
     <DateTimeInput v-model="dateTime" />
-    <p>Дата и время: {{ dateTime }}</p>
-
-    <h2>Демо: Период с датой и временем</h2>
-    <DateTimeRangeInput v-model="dateTimeRange" />
-    <p>Период: {{ dateTimeRange }}</p>
   </div>
 </template>
 
@@ -20,7 +16,6 @@
 import DateInput from "./components/inputs/DateInput.vue";
 import DateRangeInput from "./components/inputs/DateRangeInput.vue";
 import DateTimeInput from "./components/inputs/DateTimeInput.vue";
-import DateTimeRangeInput from "./components/inputs/DateTimeRangeInput.vue";
 import ThemeSwitcher from "./components/ThemeSwitcher.vue";
 import "./assets/styles/main.css";
 
@@ -30,7 +25,6 @@ export default {
     DateInput,
     DateRangeInput,
     DateTimeInput,
-    DateTimeRangeInput,
     ThemeSwitcher,
   },
   data() {
@@ -38,7 +32,6 @@ export default {
       selectedDate: null,
       selectedRange: [null, null],
       dateTime: null,
-      dateTimeRange: [null, null],
     };
   },
 };

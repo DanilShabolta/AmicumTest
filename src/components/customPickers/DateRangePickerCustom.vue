@@ -160,6 +160,7 @@ export default {
     },
     clearTrigger() {
       this.clear();
+      this.hasInputError = false;
     },
   },
 };

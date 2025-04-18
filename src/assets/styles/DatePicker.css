@@ -153,7 +153,19 @@
   border: 1px solid #2f3a5a;
 }
 
-.dark-theme .mx-datepicker-body {
+.dark-theme .mx-time-content {
+  background-color: #1e253a;
+  color: #ffffff;
+  border: 1px solid #2f3a5a;
+}
+
+.dark-theme .mx-time-header {
+  background-color: #f2f4fd;
+  color: #ffffff;
+  border: 1px solid #6f8bb7;
+}
+
+.dark-theme .mx-time-header .dark-theme .mx-datepicker-body {
   background-color: transparent;
   border: none;
 }

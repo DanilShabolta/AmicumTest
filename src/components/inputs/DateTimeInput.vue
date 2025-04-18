@@ -1,13 +1,31 @@
 <template>
-  <div class="date-time-input">
-    <div class="input-wrapper">
-      <input
-        class="manual-input"
-        v-model="dateTimeString"
-        placeholder="ДД.ММ.ГГГГ ЧЧ:ММ"
-        @blur="parseDateTime"
+  <div class="date-input">
+    <div
+      class="calendar-wrapper"
+      :class="{
+        'has-value': rawText || internalValue,
+        'has-error': error,
+      }"
+    >
+      <date-time-picker-custom
+        v-model="internalValue"
+        :error="error"
+        @clear="clearDate"
+        @raw-input="rawText = $event"
+        ref="customPicker"
+        :clear-trigger="clearTrigger"
       />
-      <date-time-picker-custom v-model="internalValue" />
+      <span
+        v-if="rawText || internalValue"
+        class="clear-icon"
+        @click="clearDate"
+        >×</span
+      >
+      <i
+        class="vue2-datepicker__icon"
+        @click="toggleCalendar"
+        role="button"
+      ></i>
     </div>
   </div>
 </template>
@@ -19,54 +37,42 @@ export default {
   name: "DateTimeInput",
   components: { DateTimePickerCustom },
   props: {
-    value: Date,
-    label: {
-      type: String,
-      default: "Дата и время",
-    },
-    error: {
-      type: Boolean,
-      default: false,
-    },
+    value: { type: Date, default: null },
+    error: { type: Boolean, default: false },
   },
   data() {
     return {
-      internalValue: this.value || null,
-      dateTimeString: this.value ? this.formatDateTime(this.value) : "",
+      internalValue: this.value,
+      rawText: "",
+      clearTrigger: false,
     };
   },
   watch: {
     value(newVal) {
       this.internalValue = newVal;
-      this.dateTimeString = this.formatDateTime(newVal);
     },
     internalValue(newVal) {
-      this.dateTimeString = this.formatDateTime(newVal);
       this.$emit("input", newVal);
+      this.rawText = newVal ? this.formatDate(newVal) : "";
     },
   },
   methods: {
-    formatDateTime(date) {
-      if (!date) return "";
-      const d = new Date(date);
-      const day = String(d.getDate()).padStart(2, "0");
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const year = d.getFullYear();
-      const hours = String(d.getHours()).padStart(2, "0");
-      const minutes = String(d.getMinutes()).padStart(2, "0");
-      return `${day}.${month}.${year} ${hours}:${minutes}`;
+    toggleCalendar() {
+      this.$refs.customPicker?.toggle();
     },
-    parseDateTime() {
-      const parts = this.dateTimeString.split(" ");
-      if (parts.length !== 2) return;
-      const [datePart, timePart] = parts;
-      const [day, month, year] = datePart.split(".");
-      const [hours, minutes] = timePart.split(":");
-      const parsed = new Date(`${year}-${month}-${day}T${hours}:${minutes}`);
-      if (!isNaN(parsed)) {
-        this.internalValue = parsed;
-        this.$emit("input", parsed);
-      }
+    clearDate() {
+      this.internalValue = null;
+      this.rawText = "";
+      this.clearTrigger = !this.clearTrigger;
+    },
+    formatDate(date) {
+      if (!date) return "";
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${pad(date.getDate())}.${pad(
+        date.getMonth() + 1
+      )}.${date.getFullYear()} ${pad(date.getHours())}:${pad(
+        date.getMinutes()
+      )}`;
     },
   },
 };

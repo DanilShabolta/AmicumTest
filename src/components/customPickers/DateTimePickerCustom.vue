@@ -2,19 +2,35 @@
   <div class="date-picker-wrapper">
     <date-picker
       ref="datepicker"
-      v-model="tempDateTime"
-      type="datetime"
-      format="DD.MM.YYYY HH:mm"
+      v-model="tempDate"
       :open="open"
       :clearable="false"
-      :editable="false"
+      :editable="true"
+      type="datetime"
+      format="dd.MM.yyyy HH:mm"
+      value-type="date"
       :popup-style="{ marginTop: '6px' }"
-      :input-attr="{ readonly: true }"
-      :class="[value ? 'filled' : 'empty', error ? 'error' : '']"
+      popup-class="custom-popup"
       @open="open = true"
-      @change="handleDateTimeChange"
-      placeholder="Выберите дату и время"
+      @change="handleDateChange"
     >
+      <template #input>
+        <div class="custom-input-wrapper" @click.stop>
+          <input
+            ref="customInput"
+            type="text"
+            class="custom-input"
+            placeholder="ДД.ММ.ГГГГ ЧЧ:ММ"
+            :value="displayValue"
+            @input="handleMaskedInput"
+            @keydown.enter="confirm"
+            :class="{
+              'input-error': error || hasInputError,
+              'input-filled': rawInput || tempDate,
+            }"
+          />
+        </div>
+      </template>
       <template #footer>
         <div class="custom-footer">
           <button class="confirm-btn" @click="confirm">Подтвердить</button>
@@ -28,36 +44,94 @@
 <script>
 import DatePicker from "vue2-datepicker";
 import "vue2-datepicker/index.css";
+import { format, parse } from "date-fns";
 
 export default {
   name: "DateTimePickerCustom",
   components: { DatePicker },
   props: {
-    value: { type: Date, default: () => null },
-    error: { type: Boolean, default: false },
+    value: { type: Date, default: null },
+    error: Boolean,
+    clearTrigger: Boolean,
   },
   data() {
     return {
-      tempDateTime: this.value,
+      tempDate: this.value,
+      rawInput: this.value ? format(this.value, "dd.MM.yyyy HH:mm") : "",
       open: false,
+      hasInputError: false,
     };
   },
+  computed: {
+    displayValue() {
+      if (this.rawInput) return this.rawInput;
+      if (this.tempDate) return format(this.tempDate, "dd.MM.yyyy HH:mm");
+      return "__.__.____ __:__";
+    },
+  },
   methods: {
+    toggle() {
+      this.open = !this.open;
+    },
     confirm() {
-      this.$emit("input", this.tempDateTime);
+      let parsed;
+
+      if (this.rawInput) {
+        parsed = parse(this.rawInput, "dd.MM.yyyy HH:mm", new Date());
+      } else if (this.tempDate) {
+        parsed = this.tempDate;
+        this.rawInput = format(parsed, "dd.MM.yyyy HH:mm");
+      }
+
+      if (!parsed || isNaN(parsed)) {
+        this.hasInputError = true;
+        return;
+      }
+
+      this.tempDate = parsed;
+      this.hasInputError = false;
       this.open = false;
+
+      this.$emit("input", this.tempDate);
+      this.$emit("confirm", this.tempDate);
     },
     cancel() {
-      this.tempDateTime = null;
+      this.hasInputError = false;
       this.open = false;
+      this.tempDate = this.value;
+      this.rawInput = this.value ? format(this.value, "dd.MM.yyyy HH:mm") : "";
     },
-    handleDateTimeChange(value) {
-      this.tempDateTime = value;
+    handleDateChange(date) {
+      this.tempDate = date;
+    },
+    handleMaskedInput(e) {
+      let input = e.target.value.replace(/[^0-9]/g, "").slice(0, 12);
+      const mask = "__.__.____ __:__".split("");
+      const map = [0, 1, 3, 4, 6, 7, 8, 9, 11, 12, 14, 15];
+
+      [...input].forEach((char, i) => {
+        if (map[i] !== undefined) mask[map[i]] = char;
+      });
+
+      const val = mask.join("");
+      this.rawInput = val;
+      this.$emit("raw-input", val);
+      this.hasInputError = false;
+
+      const parsed = parse(val, "dd.MM.yyyy HH:mm", new Date());
+      if (!isNaN(parsed)) {
+        this.tempDate = parsed;
+      }
     },
   },
   watch: {
     value(newVal) {
-      this.tempDateTime = newVal;
+      this.tempDate = newVal;
+      this.rawInput = newVal ? format(newVal, "dd.MM.yyyy HH:mm") : "";
+    },
+    clearTrigger() {
+      this.rawInput = "";
+      this.hasInputError = false;
     },
   },
 };
