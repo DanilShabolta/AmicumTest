@@ -1,24 +1,34 @@
 <template>
-  <div class="date-range-input">
+  <div class="date-input">
     <div
       class="calendar-wrapper"
       :class="{
-        'has-value': rawText || (internalRange[0] && internalRange[1]),
+        'has-value':
+          rawText.start ||
+          rawText.end ||
+          internalValue.start ||
+          internalValue.end,
         'has-error': error,
       }"
     >
       <date-range-picker-custom
-        v-model="internalRange"
+        :value="internalValue"
         :error="error"
-        @clear="clearRange"
-        @raw-input="rawText = $event"
+        @input="onPickerInput"
+        @clear="clearDate"
+        @raw-input="updateRawText"
         ref="customPicker"
         :clear-trigger="clearTrigger"
       />
       <span
-        v-if="rawText || (internalRange[0] && internalRange[1])"
+        v-if="
+          internalValue.start ||
+          internalValue.end ||
+          rawText.start ||
+          rawText.end
+        "
         class="clear-icon"
-        @click="clearRange"
+        @click="clearDate"
         >×</span
       >
       <i
@@ -37,47 +47,57 @@ export default {
   name: "DateRangeInput",
   components: { DateRangePickerCustom },
   props: {
-    value: {
-      type: Array,
-      default: () => [null, null],
-    },
-    error: {
-      type: Boolean,
-      default: false,
-    },
+    value: { type: Object, default: () => ({ start: null, end: null }) },
+    error: { type: Boolean, default: false },
   },
   data() {
     return {
-      internalRange: [...this.value],
-      rawText: "",
+      internalValue: this.value
+        ? { ...this.value }
+        : { start: null, end: null },
+      rawText: { start: "", end: "" },
       clearTrigger: false,
     };
   },
   watch: {
     value(newVal) {
-      this.internalRange = [...newVal];
+      this.internalValue = { ...newVal };
     },
-    internalRange(newVal) {
-      this.$emit("input", newVal);
-      this.rawText = this.formatRange(newVal);
+    watch: {
+      internalValue(newVal) {
+        if (Array.isArray(newVal)) {
+          this.$emit("input", { start: newVal[0], end: newVal[1] });
+        } else {
+          this.$emit("input", newVal);
+        }
+        this.rawText = {
+          start: newVal.start ? this.formatDate(newVal.start) : "",
+          end: newVal.end ? this.formatDate(newVal.end) : "",
+        };
+      },
     },
   },
   methods: {
     toggleCalendar() {
       this.$refs.customPicker?.toggle();
     },
-    clearRange() {
-      this.internalRange = [null, null];
-      this.rawText = "";
-      this.clearTrigger = !this.clearTrigger;
+    clearDate() {
+      this.internalValue = { start: null, end: null };
+      this.rawText = { start: "", end: "" };
     },
-    formatRange([start, end]) {
-      if (!start || !end) return "";
-      const formatDate = (d) =>
-        `${String(d.getDate()).padStart(2, "0")}.${String(
-          d.getMonth() + 1
-        ).padStart(2, "0")}.${d.getFullYear()}`;
-      return `${formatDate(start)} - ${formatDate(end)}`;
+    formatDate(date) {
+      return date
+        ? `${String(date.getDate()).padStart(2, "0")}.${String(
+            date.getMonth() + 1
+          ).padStart(2, "0")}.${date.getFullYear()}`
+        : "";
+    },
+    updateRawText(val) {
+      this.rawText = val;
+    },
+    onPickerInput(newVal) {
+      this.internalValue = newVal;
+      this.$emit("input", newVal);
     },
   },
 };

@@ -3,32 +3,29 @@
     <date-picker
       ref="datepicker"
       v-model="tempRange"
-      type="daterange"
+      range
       :open="open"
       :clearable="false"
-      :editable="false"
+      :editable="range"
+      :singleDatePicker="true"
+      :split-panels="false"
       :popup-style="{ marginTop: '6px' }"
       popup-class="custom-popup"
-      format="dd.MM.yyyy"
-      :range="true"
-      range-separator=" - "
-      :unlink-panels="true"
       @open="open = true"
-      @change="handleRangeChange"
+      @change="handleDateChange"
     >
       <template #input>
         <div class="custom-input-wrapper" @click.stop>
           <input
-            ref="customInput"
             type="text"
             class="custom-input"
             placeholder="ДД.ММ.ГГГГ - ДД.ММ.ГГГГ"
             :value="displayValue"
             @input="handleMaskedInput"
-            @keydown.enter="confirm"
+            @keydown.enter="handleEnter"
             :class="{
               'input-error': error || hasInputError,
-              'input-filled': rawInput,
+              'input-filled': rawInput.start || rawInput.end,
             }"
           />
         </div>
@@ -52,27 +49,31 @@ export default {
   name: "DateRangePickerCustom",
   components: { DatePicker },
   props: {
-    value: { type: Array, default: () => [null, null] },
+    value: {
+      type: Object,
+      default: () => ({ start: null, end: null }),
+    },
     error: Boolean,
     clearTrigger: Boolean,
+    singleDatePicker: String,
   },
   data() {
     return {
-      tempRange: [...this.value],
-      rawInput:
-        this.value[0] && this.value[1]
-          ? `${format(this.value[0], "dd.MM.yyyy")} - ${format(
-              this.value[1],
-              "dd.MM.yyyy"
-            )}`
-          : "",
+      tempRange: [this.value.start, this.value.end],
+      rawInput: {
+        start: this.value.start ? format(this.value.start, "dd.MM.yyyy") : "",
+        end: this.value.end ? format(this.value.end, "dd.MM.yyyy") : "",
+      },
       open: false,
       hasInputError: false,
     };
   },
   computed: {
     displayValue() {
-      return this.rawInput || "__.__.____ - __.__.____";
+      const { start, end } = this.rawInput;
+      return start || end
+        ? `${start || "__.__.____"} - ${end || "__.__.____"}`
+        : "__.__.____ - __.__.____";
     },
   },
   methods: {
@@ -80,73 +81,85 @@ export default {
       this.open = !this.open;
     },
     confirm() {
-      const [start, end] = this.tempRange;
-      if (!start || !end || isNaN(start) || isNaN(end)) {
+      const parsedStart = parse(this.rawInput.start, "dd.MM.yyyy", new Date());
+      const parsedEnd = parse(this.rawInput.end, "dd.MM.yyyy", new Date());
+
+      if (isNaN(parsedStart) || isNaN(parsedEnd)) {
         this.hasInputError = true;
         return;
       }
 
+      this.tempRange = [parsedStart, parsedEnd];
       this.hasInputError = false;
-      this.rawInput = `${format(start, "dd.MM.yyyy")} - ${format(
-        end,
-        "dd.MM.yyyy"
-      )}`;
       this.open = false;
-      this.$emit("input", [start, end]);
-      this.$emit("confirm", [start, end]);
+
+      this.rawInput = {
+        start: format(parsedStart, "dd.MM.yyyy"),
+        end: format(parsedEnd, "dd.MM.yyyy"),
+      };
+
+      this.$emit("input", { start: parsedStart, end: parsedEnd });
+      this.$emit("confirm", { start: parsedStart, end: parsedEnd });
     },
     cancel() {
       this.hasInputError = false;
       this.open = false;
-      this.tempRange = [...this.value];
-      this.rawInput =
-        this.value[0] && this.value[1]
-          ? `${format(this.value[0], "dd.MM.yyyy")} - ${format(
-              this.value[1],
-              "dd.MM.yyyy"
-            )}`
-          : "";
+      this.tempRange = [this.value.start, this.value.end];
+      this.rawInput = {
+        start: this.value.start ? format(this.value.start, "dd.MM.yyyy") : "",
+        end: this.value.end ? format(this.value.end, "dd.MM.yyyy") : "",
+      };
     },
-    handleRangeChange(range) {
-      this.tempRange = range;
+    handleEnter() {
+      if (
+        this.rawInput.start.length === 10 &&
+        this.rawInput.end.length === 10
+      ) {
+        this.confirm();
+      }
+    },
+    handleDateChange([start, end]) {
+      this.tempRange = [start, end];
+      this.rawInput = {
+        start: start ? format(start, "dd.MM.yyyy") : "",
+        end: end ? format(end, "dd.MM.yyyy") : "",
+      };
+      this.$emit("raw-input", { ...this.rawInput });
     },
     handleMaskedInput(e) {
-      const digits = e.target.value.replace(/\D/g, "").slice(0, 16);
-      const mask = "__.__.____ - __.__.____".split("");
+      const raw = e.target.value.replace(/\D/g, "").slice(0, 16);
+      const s = raw.slice(0, 8);
+      const e_ = raw.slice(8, 16);
 
-      [...digits].forEach((char, i) => {
-        const map = [0, 1, 3, 4, 6, 7, 8, 9, 13, 14, 16, 17, 19, 20, 21, 22];
-        if (map[i] !== undefined) mask[map[i]] = char;
-      });
+      const applyMask = (digits) => {
+        const mask = "__.__.____".split("");
+        [...digits].forEach((char, i) => {
+          const map = [0, 1, 3, 4, 6, 7, 8, 9];
+          if (map[i] !== undefined) mask[map[i]] = char;
+        });
+        return mask.join("");
+      };
 
-      const val = mask.join("");
-      this.rawInput = val;
-      this.$emit("raw-input", val);
+      this.rawInput.start = applyMask(s);
+      this.rawInput.end = applyMask(e_);
       this.hasInputError = false;
-
-      const parts = val.split(" - ");
-      if (parts.length === 2) {
-        const start = parse(parts[0], "dd.MM.yyyy", new Date());
-        const end = parse(parts[1], "dd.MM.yyyy", new Date());
-        if (!isNaN(start) && !isNaN(end)) {
-          this.tempRange = [start, end];
-        }
-      }
+      this.$emit("raw-input", { ...this.rawInput });
+    },
+    clear() {
+      this.tempRange = [null, null];
+      this.rawInput = { start: "", end: "" };
     },
   },
   watch: {
     value(newVal) {
-      this.tempRange = [...newVal];
-      this.rawInput =
-        newVal[0] && newVal[1]
-          ? `${format(newVal[0], "dd.MM.yyyy")} - ${format(
-              newVal[1],
-              "dd.MM.yyyy"
-            )}`
-          : "";
+      this.tempRange = [newVal.start, newVal.end];
+      this.rawInput = {
+        start: newVal.start ? format(newVal.start, "dd.MM.yyyy") : "",
+        end: newVal.end ? format(newVal.end, "dd.MM.yyyy") : "",
+      };
     },
     clearTrigger() {
-      this.rawInput = "";
+      this.clear();
     },
   },
 };
